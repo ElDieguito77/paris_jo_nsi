@@ -27,27 +27,51 @@ class Joueur(pygame.sprite.Sprite):
         self.dernier_point_visite = point_depart
         self.prochains_points_a_visiter = []
 
+    def est_en_mouvement(self) -> bool:
+        """
+            Vérifie si le joueur est actuellement en train de suivre un itinéraire.\n
+
+            Renvoie:\n
+                - bool\n
+        """
+        return self.prochains_points_a_visiter == []
+
     # Fonction destination_atteinte_rayon()
     def destination_atteinte_rayon(self, destination:str, rayon:int) -> bool:
         """
-        
+            Vérifie si le joueur se trouve dans un certain rayon de la destination indiquée.\n
+
+            Paramètres:\n
+                - destination (str) : Nom du point de destination.\n
+                - rayon (int) : rayon (en pixels) autour du point dans lequel la fonction considère que
+                le joueur a atteint la destination.\n
+
+            Renvoie:\n
+                - bool : True si le joueur a atteint la destination.\n
+                         False si le joueur n'est pas encore dans la destination.\n
         """
         coord_destination = self.paris_graphe.get_graphe().nodes[destination]["COORDONNEES"]
         dist = sqrt((self.pos[0]-coord_destination[0])**2+(self.pos[1]-coord_destination[1])**2)
         return dist <= rayon
 
     # Fonction calculer_direction()
-    def calculer_direction(self, destination) -> None:
+    def calculer_direction(self, destination:str):
         """
-        
+            Calcule un vecteur directeur entre la position du joueur et sa destination.\n
+
+            Paramètres:\n
+                - destination (str) : Nom du point de destination.\n
         """
         coord_destination = self.paris_graphe.get_graphe().nodes[destination]["COORDONNEES"]
         self.direction = pygame.Vector2(coord_destination[0]-self.pos[0],coord_destination[1]-self.pos[1])
 
     # Fonction parcourir_trajet()
-    def parcourir_trajet(self, trajet:list) -> None:
+    def parcourir_trajet(self, trajet:list):
         """
+            Prend en charge les déplacements des trajectoires du joueur en fonction d'un trajet donné.\n
 
+            Paramètres:\n
+                - trajet (list) : Liste contenant le nom (str) des prochains points jusqu'à la destination.\n
         """
         if self.prochains_points_a_visiter != []:
             if self.direction_est_fixee == False:
@@ -105,7 +129,7 @@ class CameraGroup(pygame.sprite.Group):
         self.half_h = self.display_surface.get_size()[1] // 2
 
         # Mise en place de la boîte autour du joueur.
-        self.camera_borders = {'left': 200, 'right': 200, 'top': 100, 'bottom': 100}
+        self.camera_borders = {'left': 300, 'right': 300, 'top': 200, 'bottom': 200}
         l = self.camera_borders['left'] ; t = self.camera_borders['top']
         w = self.display_surface.get_size()[0]  - (self.camera_borders['left'] + self.camera_borders['right'])
         h = self.display_surface.get_size()[1]  - (self.camera_borders['top'] + self.camera_borders['bottom'])
@@ -119,26 +143,32 @@ class CameraGroup(pygame.sprite.Group):
         self.keyboard_speed = 6
 
     # Fonction center_target_camera()
-    def center_target_camera(self,target):
+    def center_target_camera(self,player:Joueur):
         """
-            Permet de center la caméra autour du joueur en le gardant en centre.
+            Permet de center la caméra autour du joueur en le gardant en centre.\n
+
+            Paramètres:\n
+                - player (Joueur) : Joueur autour duquel la box camera se centrera.\n
         """
-        self.offset.x = target.rect.centerx - self.half_w
-        self.offset.y = target.rect.centery - self.half_h
+        self.offset.x = player.rect.centerx - self.half_w
+        self.offset.y = player.rect.centery - self.half_h
 
     # Fonction box_target_camera()
-    def box_target_camera(self,target):
+    def box_target_camera(self,player:Joueur):
         """
-            Prend en charge le mouvement du rectangle de caméra autour du joueur.
+            Prend en charge le mouvement du rectangle de caméra autour du joueur.\n
+
+            Paramètres:\n
+                - player (Joueur) : Joueur autour duquel la box camera se centrera.\n
         """
-        if target.rect.left < self.camera_rect.left:
-            self.camera_rect.left = target.rect.left
-        if target.rect.right > self.camera_rect.right:
-            self.camera_rect.right = target.rect.right
-        if target.rect.top < self.camera_rect.top:
-            self.camera_rect.top = target.rect.top
-        if target.rect.bottom > self.camera_rect.bottom:
-            self.camera_rect.bottom = target.rect.bottom
+        if player.rect.left < self.camera_rect.left:
+            self.camera_rect.left = player.rect.left
+        if player.rect.right > self.camera_rect.right:
+            self.camera_rect.right = player.rect.right
+        if player.rect.top < self.camera_rect.top:
+            self.camera_rect.top = player.rect.top
+        if player.rect.bottom > self.camera_rect.bottom:
+            self.camera_rect.bottom = player.rect.bottom
 
         self.offset.x = self.camera_rect.left - self.camera_borders['left']
         self.offset.y = self.camera_rect.top - self.camera_borders['top']
@@ -159,9 +189,13 @@ class CameraGroup(pygame.sprite.Group):
         self.offset.y = self.camera_rect.top - self.camera_borders['top']
 
     # Fonction custom_draw()
-    def custom_draw(self,player):
+    def custom_draw(self,player:Joueur):
         """
-            Affiche périodiquement les sprites de tous les objets du groupe de caméra.
+            Affiche périodiquement les sprites de tous les objets du groupe de caméra.\n
+
+            Paramètres:\n
+                - player (Joueur) : Instance de la classe Joueur.\n
+
         """
         global global_offset
 
@@ -220,6 +254,7 @@ class Points_Paris():
             Renvoie:\n
                 - (list) : Trajet avec comme élements le nom (str) de tous les points à visiter.\n
         """
+        assert type(point_debut) == str and type(point_fin) == str, "Des noms de points en chaînes de caractères sont attendues en paramètres."
         return nwx.algorithms.astar_path(self.G, point_debut, point_fin)
 
     # Fonction trouver_point_le_plus_proche()
