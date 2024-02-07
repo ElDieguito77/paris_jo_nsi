@@ -210,6 +210,16 @@ class Points_Paris():
 
     # Fonction trouver_trajet()
     def trouver_trajet(self, point_debut:str, point_fin:str) -> list:
+        """
+            Utilise l'algorithme A* dans le graphe pour trouver le trajet le plus court entre un point et un autre.\n
+
+            Paramètres:\n
+                - point_debut (str) : Nom du point de départ.\n
+                - point_fin (str) : Nom du point où l'on souhaite arriver.\n
+            
+            Renvoie:\n
+                - (list) : Trajet avec comme élements le nom (str) de tous les points à visiter.\n
+        """
         return nwx.algorithms.astar_path(self.G, point_debut, point_fin)
 
     # Fonction trouver_point_le_plus_proche()
