@@ -27,6 +27,7 @@ class Joueur(pygame.sprite.Sprite):
         self.dernier_point_visite = point_depart
         self.prochains_points_a_visiter = []
 
+    # Fonction est_en_mouvement()
     def est_en_mouvement(self) -> bool:
         """
             Vérifie si le joueur est actuellement en train de suivre un itinéraire.\n
@@ -97,7 +98,9 @@ class Joueur(pygame.sprite.Sprite):
         destination = self.paris_graphe.trouver_point_le_plus_proche(mouse_pos)
         if self.prochains_points_a_visiter != []:
             if self.prochains_points_a_visiter[-1] != destination:
-                self.prochains_points_a_visiter = self.paris_graphe.trouver_trajet(self.dernier_point_visite, destination)
+                nouveau_depart = self.prochains_points_a_visiter[0]
+                self.prochains_points_a_visiter = []    # Au cas-où, on réinitialise la liste des points à parcourir. N'est probablement pas utile, mais on ne sait jamais.
+                self.prochains_points_a_visiter = self.paris_graphe.trouver_trajet(nouveau_depart, destination)
         else:
             self.prochains_points_a_visiter = self.paris_graphe.trouver_trajet(self.dernier_point_visite, destination)
 
