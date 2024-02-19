@@ -19,6 +19,7 @@ class Joueur(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom = self.pos)
         self.direction = pygame.math.Vector2()
         self.speed = 0.5
+        self.nom = "Joueur"
 
         self.clock = pygame.time.Clock()
 
@@ -116,7 +117,21 @@ class Joueur(pygame.sprite.Sprite):
         self.pos[0] += self.direction.x * self.speed * dt
         self.pos[1] += self.direction.y * self.speed * dt
         # self.rect.center = self.pos       # Pour afficher le Sprite par rapport à son centre
-        self.rect.bottomleft = self.pos-pygame.Vector2(self.rect.width//2,0) # Pour affiche le sprite par rapport au midbottom
+        self.rect.bottomleft = self.pos-pygame.Vector2(self.rect.width//2,0) # Pour afficher le sprite par rapport au midbottom
+
+
+class Icon(pygame.sprite.Sprite):
+    # Initialisation de l'icône
+    def __init__(self, pos, group, nom_icone:str):
+        super().__init__(group)
+        self.pos = pos
+        self.image = pygame.image.load(f'./images/icons/{nom_icone}.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, (70,70))
+        self.rect = self.image.get_rect(center = self.pos)
+        self.nom = nom_icone
+
+    def get_nom(self):
+        return self.nom
 
 
 # Classe CameraGroup()
@@ -144,6 +159,7 @@ class CameraGroup(pygame.sprite.Group):
 
         # Vitesse de la caméra.
         self.keyboard_speed = 6
+
 
     # Fonction center_target_camera()
     def center_target_camera(self,player:Joueur):
@@ -213,7 +229,7 @@ class CameraGroup(pygame.sprite.Group):
         # Affichage des éléments du groupe de la caméra
         for sprite in sorted(self.sprites(),key = lambda sprite: sprite.rect.centery):
             offset_pos = sprite.rect.topleft - self.offset
-            self.display_surface.blit(sprite.image,offset_pos)
+            self.display_surface.blit(sprite.image,offset_pos)  
         global_offset = self.offset
 
 
@@ -297,6 +313,10 @@ global_offset = pygame.math.Vector2()
 camera_group = CameraGroup()
 graphe_paris = Points_Paris()
 player = Joueur(camera_group, "1")
+
+# Icones principales
+football_icon = Icon((3864, 1145), camera_group, "football2")
+
 
 
 # Boucle principale.
