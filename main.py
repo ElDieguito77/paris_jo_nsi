@@ -28,6 +28,10 @@ class Joueur(pygame.sprite.Sprite):
         self.dernier_point_visite = point_depart
         self.prochains_points_a_visiter = []
 
+    # Fonction derniere_visite()
+    def derniere_visite(self):
+        return self.dernier_point_visite
+
     # Fonction est_en_mouvement()
     def est_en_mouvement(self) -> bool:
         """
@@ -36,7 +40,7 @@ class Joueur(pygame.sprite.Sprite):
             Renvoie:\n
                 - bool\n
         """
-        return self.prochains_points_a_visiter == []
+        return len(self.prochains_points_a_visiter) != 0
 
     # Fonction destination_atteinte_rayon()
     def destination_atteinte_rayon(self, destination:str, rayon:int) -> bool:
@@ -325,9 +329,14 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-        if event.type == pygame.MOUSEBUTTONUP:
+        if pygame.mouse.get_pressed()[0] == 1:
             mouse_pos_on_click = pygame.mouse.get_pos()+global_offset
             player.definir_trajet(mouse_pos_on_click)
+        if pygame.mouse.get_pressed()[2] == 1 and not player.est_en_mouvement():
+            # Epreuve du footbal
+            if player.derniere_visite() == "83" or player.derniere_visite() == "119":
+                with open("./epreuves/football.py") as f:
+                    exec(f.read())
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()
