@@ -30,6 +30,9 @@ class Joueur(pygame.sprite.Sprite):
 
     # Fonction derniere_visite()
     def derniere_visite(self):
+        """
+            Renvoie le dernier point visité par le joueur.\n
+        """
         return self.dernier_point_visite
 
     # Fonction est_en_mouvement()
